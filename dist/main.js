@@ -1,10 +1,20 @@
+var _a, _b;
 import { firstNames, lastNames } from './data/names.js';
-import { occupations, occupationItems } from './data/occupations.js';
+import { occupations, occupationItems, asciiBanners } from './data/occupations.js';
 import { combatItems } from './data/weapons.js';
+import { whispers } from './data/whispers.js';
+import { ritualCorruption } from "./data/corrupt_sanity.js";
+const whispersBtn = document.getElementById("whispersBtn");
+const whisperText = document.getElementById("whisperText");
+const itemSelect = document.getElementById("itemSelect");
 let currentHp = 0;
 let maxHp = 0;
 let currentSanity = 0;
-const maxSanity = 10;
+let maxSanity = 0;
+let ritualTriggered = false;
+let supportNames = [];
+let itemUses = {};
+let characterStats;
 let characterName = "";
 let characterOccupation = "";
 let weaponDetails = [];
@@ -16,131 +26,6 @@ function formatItemLine(name, type, damage, uses, maxLength = 25) {
         ? `${name}\n  ${details}`
         : `${name} ${details}`;
 }
-const asciiBanners = {
-    "Private Investigator": `╔════════════════════════════════════════╗
-║  Case File – Confidential Dossier      ║
-╚════════════════════════════════════════╝`,
-    "Jazz Musician": `╔════════════════════════════════════════╗
-║  Jazz Circuit – Performer Roster       ║
-╚════════════════════════════════════════╝`,
-    "Bootlegger": `╔════════════════════════════════════════╗
-║  Prohibition Watchlist – Suspect ID    ║
-╚════════════════════════════════════════╝`,
-    "Occult Scholar": `╔════════════════════════════════════════╗
-║  Miskatonic Archives – Scholar File    ║
-╚════════════════════════════════════════╝`,
-    "Flapper": `╔════════════════════════════════════════╗
-║  Socialite Registry – Party Circuit    ║
-╚════════════════════════════════════════╝`,
-    "Newsboy": `╔════════════════════════════════════════╗
-║  Press Ledger – Distribution File      ║
-╚════════════════════════════════════════╝`,
-    "Factory Worker": `╔════════════════════════════════════════╗
-║  Labor Registry – Worker File          ║
-╚════════════════════════════════════════╝`,
-    "Con Artist": `╔════════════════════════════════════════╗
-║  Confidence File – Known Alias         ║
-╚════════════════════════════════════════╝`,
-    "Radio Host": `╔════════════════════════════════════════╗
-║  Broadcast Registry – Host Profile     ║
-╚════════════════════════════════════════╝`,
-    "Librarian": `╔════════════════════════════════════════╗
-║  Library Index – Staff Credentials     ║
-╚════════════════════════════════════════╝`,
-    "Street Magician": `╔════════════════════════════════════════╗
-║  Illusion Registry – Performer File    ║
-╚════════════════════════════════════════╝`,
-    "Speakeasy Bartender": `╔════════════════════════════════════════╗
-║  Speakeasy Log – Staff Credentials     ║
-╚════════════════════════════════════════╝`,
-    "Gravedigger": `╔════════════════════════════════════════╗
-║  Cemetery Ledger – Gravekeeper File    ║
-╚════════════════════════════════════════╝`,
-    "Cultist Defector": `╔════════════════════════════════════════╗
-║  Cult Watch – Defector Testimony       ║
-╚════════════════════════════════════════╝`,
-    "Cabaret Dancer": `╔════════════════════════════════════════╗
-║  Cabaret Ledger – Performer Profile    ║
-╚════════════════════════════════════════╝`,
-    "Cryptographer": `╔════════════════════════════════════════╗
-║  Cipher Bureau – Encrypted Profile     ║
-╚════════════════════════════════════════╝`,
-    "Paranormal Investigator": `╔════════════════════════════════════════╗
-║  Bureau of Anomalies – Field Report    ║
-╚════════════════════════════════════════╝`,
-    "Antique Dealer": `╔════════════════════════════════════════╗
-║  Trade Ledger – Dealer Inventory       ║
-╚════════════════════════════════════════╝`,
-    "Asylum Nurse": `╔════════════════════════════════════════╗
-║  Arkham Asylum – Staff Credentials     ║
-╚════════════════════════════════════════╝`,
-    "Aviator": `╔════════════════════════════════════════╗
-║  Flight Log – Pilot Credentials        ║
-╚════════════════════════════════════════╝`,
-    "Rum Runner": `╔════════════════════════════════════════╗
-║  Smuggler Manifest – Cargo Record      ║
-╚════════════════════════════════════════╝`,
-    "Bellhop": `╔════════════════════════════════════════╗
-║  Hotel Staff – Service Record          ║
-╚════════════════════════════════════════╝`,
-    "Stenographer": `╔════════════════════════════════════════╗
-║  Transcript Bureau – Typist File       ║
-╚════════════════════════════════════════╝`,
-    "Snake Oil Salesman": `╔════════════════════════════════════════╗
-║  Traveling Tonic – Sales Ledger        ║
-╚════════════════════════════════════════╝`,
-    "Lighthouse Keeper": `╔════════════════════════════════════════╗
-║  Coastal Registry – Keeper Log         ║
-╚════════════════════════════════════════╝`,
-    "Radio Technician": `╔════════════════════════════════════════╗
-║  Signal Division – Technician Log      ║
-╚════════════════════════════════════════╝`,
-    "Newspaper Editor": `╔════════════════════════════════════════╗
-║  Editorial Office – Staff Record       ║
-╚════════════════════════════════════════╝`,
-    "Carnival Barker": `╔════════════════════════════════════════╗
-║  Carnival Ledger – Showman Profile     ║
-╚════════════════════════════════════════╝`,
-    "Chemistry Professor": `╔════════════════════════════════════════╗
-║  Faculty Record – Science Division     ║
-╚════════════════════════════════════════╝`,
-    "Bank Robber": `╔════════════════════════════════════════╗
-║  Federal Offense – Wanted Profile      ║
-╚════════════════════════════════════════╝`,
-    "Train Conductor": `╔════════════════════════════════════════╗
-║  Rail Manifest – Crew Credentials      ║
-╚════════════════════════════════════════╝`,
-    "Seance Medium": `╔════════════════════════════════════════╗
-║  Spirit Channel – Session Transcript   ║
-╚════════════════════════════════════════╝`,
-    "Union Organizer": `╔════════════════════════════════════════╗
-║  Union Archive – Organizer Record      ║
-╚════════════════════════════════════════╝`,
-    "Jazz Club Owner": `╔════════════════════════════════════════╗
-║  Venue Record – Proprietor File        ║
-╚════════════════════════════════════════╝`,
-    "WWI Veteran": `╔════════════════════════════════════════╗
-║  Military Archive – Veteran Record     ║
-╚════════════════════════════════════════╝`,
-    "Bookstore Clerk": `╔════════════════════════════════════════╗
-║  Inventory Ledger – Bookstore Staff    ║
-╚════════════════════════════════════════╝`,
-    "Forensic Analyst": `╔════════════════════════════════════════╗
-║  Evidence Log – Forensic Division      ║
-╚════════════════════════════════════════╝`,
-    "Museum Curator": `╔════════════════════════════════════════╗
-║  Antiquities Registry – Curator Log    ║
-╚════════════════════════════════════════╝`,
-    "Moonshine Chemist": `╔════════════════════════════════════════╗
-║  Illicit Lab – Formula Registry        ║
-╚════════════════════════════════════════╝`,
-    "Bounty Hunter": `╔════════════════════════════════════════╗
-║  Target File – Hunter Authorization    ║
-╚════════════════════════════════════════╝`,
-    "Default": `╔════════════════════════════════════════╗
-║  Character Manifest – Arkham Registry  ║
-╚════════════════════════════════════════╝`
-};
 const meleeWeapons = Object.entries(combatItems)
     .filter(([_, data]) => data.type === "melee")
     .map(([name]) => name);
@@ -156,26 +41,56 @@ function generateName() {
     const last = lastNames[Math.floor(Math.random() * lastNames.length)];
     return `${first} ${last}`;
 }
+function generateStat(min = 25, max = 85, step = 5) {
+    const range = Math.floor((max - min) / step) + 1;
+    const value = Math.floor(Math.random() * range);
+    return min + value * step;
+}
 function generateCharacterData() {
-    maxHp = Math.floor(Math.random() * 11) + 5;
+    const characterText = document.getElementById("characterText");
+    if (characterText) {
+        characterText.style.opacity = "1";
+        characterText.classList.remove("corrupted");
+    }
+    ritualTriggered = false;
+    itemUses = {};
+    maxHp = Math.floor(Math.random() * 9) + 7;
     currentHp = maxHp;
+    maxSanity = Math.floor(Math.random() * 6) + 5;
     currentSanity = maxSanity;
     characterName = generateName();
     characterOccupation = occupations[Math.floor(Math.random() * occupations.length)];
+    characterStats = {
+        Strength: generateStat(),
+        Dexterity: generateStat(),
+        Perception: generateStat(),
+        Knowledge: generateStat()
+    };
     const weaponChance = Math.random() < 0.05;
     const weapons = weaponChance
         ? getRandomSample(weaponPool, 1)
         : [weaponPool[Math.floor(Math.random() * weaponPool.length)]];
     weaponDetails = weapons.map(name => {
         const w = combatItems[name];
+        itemUses[name] = { current: w.uses, max: w.uses };
         return formatItemLine(name, w.type, w.damage, w.uses);
     });
-    const supportNames = getRandomSample(supportItems, Math.floor(Math.random() * 4));
+    supportNames = getRandomSample(supportItems, Math.floor(Math.random() * 4));
     supportDetails = supportNames.map(name => {
         const item = combatItems[name];
+        if (item.uses) {
+            itemUses[name] = { current: item.uses, max: item.uses };
+        }
         return formatItemLine(name, item.type, item.damage, item.uses);
     });
     occupationItemsList = getRandomSample(occupationItems[characterOccupation] || [], Math.floor(Math.random() * 3) + 2);
+    itemSelect.innerHTML = ""; // clear previous
+    Object.keys(itemUses).forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = `${name} (${itemUses[name].current}/${itemUses[name].max})`;
+        itemSelect.appendChild(option);
+    });
 }
 function getAsciiBanner(occupation) {
     for (const key in asciiBanners) {
@@ -187,6 +102,20 @@ function getAsciiBanner(occupation) {
 }
 function renderCharacter(output, useTypewriter = true) {
     const asciiArt = getAsciiBanner(characterOccupation);
+    // 🧠 Build stats block
+    let statsBlock = "";
+    Object.entries(characterStats).forEach(([stat, value]) => {
+        statsBlock += `${stat}: ${value}\n`;
+    });
+    const cleanedSupportDetails = supportDetails.map(line => {
+        const match = line.match(/^(.+?) \(([^,]+), (.+)\)$/);
+        if (!match)
+            return line; // fallback if format doesn't match
+        const name = match[1]; // "First Aid Kit"
+        const effect = match[3]; // "heal 1d6, uses: 3"
+        return `${name}: ${effect}`;
+    });
+    // 🧾 Build full character sheet
     const character = `
 ${asciiArt}
 
@@ -195,10 +124,13 @@ Occupation: ${characterOccupation}
 HP: ${currentHp}/${maxHp}
 Sanity: ${currentSanity}/${maxSanity}
 
+${statsBlock}
 Inventory:
 - Weapons: ${weaponDetails.join('\n  - ')}
-- Support: \n  - ${supportDetails.join('\n  - ')}
-- Occupation Items: \n  - ${occupationItemsList.join('\n  - ')}
+- Support: 
+  - ${cleanedSupportDetails.join('\n  - ')}
+- Occupation Items: 
+  - ${occupationItemsList.join('\n  - ')}
 `;
     const characterText = document.getElementById("characterText");
     if (!characterText)
@@ -227,6 +159,26 @@ function typeWriterEffect(element, text, speed = 30, append = false) {
         }
     }
     type();
+}
+function checkSanityWhisper() {
+    const characterText = document.getElementById("characterText");
+    if (!characterText)
+        return;
+    if (currentSanity === 0) {
+        ritualCorruption(characterText);
+    }
+}
+function rebuildItemDetails() {
+    weaponDetails = Object.keys(itemUses)
+        .filter(name => combatItems[name].type === "melee" || combatItems[name].type === "ranged")
+        .map(name => {
+        const item = combatItems[name];
+        return formatItemLine(name, item.type, item.damage, itemUses[name].current);
+    });
+    supportDetails = supportNames.map(name => {
+        const item = combatItems[name];
+        return formatItemLine(name, item.type, item.damage, itemUses[name].current);
+    });
 }
 document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('characterOutput');
@@ -257,12 +209,81 @@ document.addEventListener('DOMContentLoaded', () => {
         if (output && currentSanity > 0) {
             currentSanity--;
             renderCharacter(output, false);
+            if (currentSanity === 0 && !ritualTriggered) {
+                ritualTriggered = true;
+                checkSanityWhisper(); // or ritualCorruption()
+            }
         }
     });
     sanityPlus === null || sanityPlus === void 0 ? void 0 : sanityPlus.addEventListener('click', () => {
-        if (output && currentSanity < maxSanity) {
+        if (output && currentSanity < maxSanity && currentSanity > 0) {
             currentSanity++;
             renderCharacter(output, false);
         }
     });
 });
+whispersBtn === null || whispersBtn === void 0 ? void 0 : whispersBtn.addEventListener("click", () => {
+    if (!whisperText)
+        return;
+    // Pick a random whisper
+    const whisper = whispers[Math.floor(Math.random() * whispers.length)];
+    // Show it
+    whisperText.textContent = whisper;
+    whisperText.style.opacity = "1";
+    // Hide after 3 seconds
+    setTimeout(() => {
+        whisperText.style.opacity = "0";
+    }, 3000);
+});
+(_a = document.getElementById("useBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
+    var _a;
+    const selected = itemSelect.value;
+    if (((_a = itemUses[selected]) === null || _a === void 0 ? void 0 : _a.current) > 0) {
+        itemUses[selected].current--;
+        updateDropdownLabel(selected);
+        rebuildItemDetails();
+        const output = document.getElementById("characterOutput");
+        if (output)
+            renderCharacter(output, false);
+    }
+});
+function triggerWhisper(message) {
+    const whisperText = document.getElementById("whisperText");
+    if (!whisperText)
+        return;
+    const whisper = message || whispers[Math.floor(Math.random() * whispers.length)];
+    whisperText.textContent = whisper;
+    whisperText.style.opacity = "1";
+    setTimeout(() => {
+        whisperText.style.opacity = "0";
+    }, 3000);
+}
+function hasAmmoPouch() {
+    return supportNames.includes("Ammo Pouch");
+}
+(_b = document.getElementById("reloadBtn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
+    const selected = itemSelect.value;
+    const item = itemUses[selected];
+    if (!item)
+        return;
+    if (item.current < item.max) {
+        const refill = hasAmmoPouch()
+            ? item.max
+            : Math.max(1, Math.floor(item.max / 3));
+        item.current = Math.min(item.current + refill, item.max);
+        updateDropdownLabel(selected);
+        rebuildItemDetails();
+        const output = document.getElementById("characterOutput");
+        if (output)
+            renderCharacter(output, false);
+        triggerWhisper("The weapon feels reliable... for now");
+    }
+});
+function updateDropdownLabel(name) {
+    const options = itemSelect.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === name) {
+            options[i].textContent = `${name} (${itemUses[name].current}/${itemUses[name].max})`;
+        }
+    }
+}

@@ -26,7 +26,7 @@ export const combatItems = {
     "Cocaine": { type: "medical", damage: "sanity +1d4", uses: 1 },
     // 🛡 Tactical Gear
     "Gas Mask": { type: "tactical", damage: "nullify gas", uses: 10 },
-    "Bulletproof Vest": { type: "tactical", damage: "reduce 1d6", uses: 20 },
+    "Bulletproof Vest": { type: "tactical", damage: "block dmg 1d4", uses: 20 },
     "Ammo Pouch": { type: "tactical", damage: "reload", uses: 10 },
     "Combat Boots": { type: "tactical", damage: "fire resistant", uses: 30 },
     "Signal Flare": { type: "tactical", damage: "alert", uses: 1 },

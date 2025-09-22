@@ -1,40 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Character Generator</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <title>Character Generator</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <div id="container">
-    <!-- Optional canvas layer if you're using effects -->
-    <canvas id="parchmentCanvas"></canvas>
+    <div id="container">
+        <!-- Optional canvas layer if you're using effects -->
+        <canvas id="parchmentCanvas"></canvas>
 
-    <!-- Journal background wrapper -->
-    <div id="journalBackground">
-      <div id="characterOutput">
-        <pre id="characterText"></pre>
-      </div>
+        <!-- Journal background wrapper -->
+        <div id="journalBackground">
+            <div id="characterOutput">
+                <pre id="characterText"></pre>
+                <!-- for insanity effects -->
+                <div id="ritualOverlayContainer"></div>
+                <pre id="sanityWhisperText"></pre>
+                <div id="whisperText"></div>
+            </div>
+        </div>
+
+        <!-- Controls fixed at top -->
+        <div id="controls">
+            <button id="generateBtn">Generate Character</button>
+
+            <div class="stat-controls">
+                <span>HP:</span>
+                <button id="hpMinus">−</button>
+                <button id="hpPlus">+</button>
+            </div>
+
+            <div class="stat-controls">
+                <span>Sanity:</span>
+                <button id="sanityMinus">−</button>
+                <button id="sanityPlus">+</button>
+            </div>
+
+            <div id="useControls" class="stat-controls">
+                <label for="itemSelect">Item:</label>
+                <select id="itemSelect"></select>
+
+                <button id="useBtn">Use</button>
+                <button id="reloadBtn">Reload</button>
+            </div>
+
+        </div>
+        <!-- Whispers button fixed to bottom left -->
+        <button id="whispersBtn">Whispers from Beyond</button>
+
     </div>
 
-    <!-- Controls fixed at bottom -->
-    <div id="controls">
-      <button id="generateBtn">Generate Character</button>
-
-      <div class="stat-controls">
-        <span>HP:</span>
-        <button id="hpMinus">−</button>
-        <button id="hpPlus">+</button>
-      </div>
-
-      <div class="stat-controls">
-        <span>Sanity:</span>
-        <button id="sanityMinus">−</button>
-        <button id="sanityPlus">+</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="./dist/main.js"></script>
+    <script type="module" src="./dist/main.js"></script>
 </body>
+
 </html>
