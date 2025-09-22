@@ -13,6 +13,13 @@ let weaponDetails: string[] = [];
 let supportDetails: string[] = [];
 let occupationItemsList: string[] = [];
 
+function formatItemLine(name: string, type: string, damage: string, uses: number, maxLength = 25): string {
+  const details = `(${type}, ${damage}, uses: ${uses})`;
+  return name.length > maxLength
+    ? `${name}\n  ${details}`
+    : `${name} ${details}`;
+}
+
 const asciiBanners: Record<string, string> = {
   "Private Investigator": `╔════════════════════════════════════════╗
 ║  Case File – Confidential Dossier      ║
@@ -211,19 +218,19 @@ function generateCharacterData(): void {
 
   const weaponChance = Math.random() < 0.05;
   const weapons = weaponChance
-    ? getRandomSample(weaponPool, 2)
+    ? getRandomSample(weaponPool, 1)
     : [weaponPool[Math.floor(Math.random() * weaponPool.length)]];
 
   weaponDetails = weapons.map(name => {
     const w = combatItems[name];
-    return `${name} (${w.type}, ${w.damage}, uses: ${w.uses})`;
-  });
+    return formatItemLine(name, w.type, w.damage, w.uses);
+});
 
   const supportNames = getRandomSample(supportItems, Math.floor(Math.random() * 4));
-  supportDetails = supportNames.map(name => {
-    const item = combatItems[name];
-    return `${name} (${item.type}, ${item.damage}, uses: ${item.uses})`;
-  });
+supportDetails = supportNames.map(name => {
+  const item = combatItems[name];
+  return formatItemLine(name, item.type, item.damage, item.uses);
+});
 
   occupationItemsList = getRandomSample(
     occupationItems[characterOccupation] || [],
