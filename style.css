@@ -73,15 +73,12 @@ body {
     pointer-events: none;
     /* optional: prevents accidental clicks */
     white-space: pre-line;
-
 }
 
-/* remember to add this to new wrappers yms yms
-.post-it:nth-child(2) {
-    margin-top: -120px;
-    transform: rotate(1.5deg);
+.insane-note {
+    color: #8A0303 !important;
+    font-family: 'Creepster', cursive !important;
 }
-    */
 
 /* Journal Background */
 #journalBackground {
@@ -201,16 +198,22 @@ button,
 
 button:hover,
 #whispersBtn:hover {
-    background-color: #d6c8a9;
+    box-shadow: 0 0 8px #8b7d6b;
 }
+
 
 /* Whispers Button */
 #whispersBtn {
     position: fixed;
     bottom: 1rem;
-    left: 1rem;
+    right: 1rem;
     z-index: 101;
 }
+
+.whispers-active {
+    animation: pulse 1s infinite;
+}
+
 
 /* Whisper Text */
 #whisperText,
@@ -269,6 +272,8 @@ pre::first-line {
     text-align: center;
 }
 
+/* Animations */
+
 /* Ritual Fragment Animation */
 @keyframes fragmentFade {
     0% {
@@ -285,4 +290,78 @@ pre::first-line {
         opacity: 0;
         transform: translateY(-4px);
     }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(1);
+    }
+
+    5% {
+        transform: scale(1.01);
+    }
+
+    10% {
+        transform: scale(1);
+    }
+
+    15% {
+        transform: scale(1.01);
+    }
+
+    20% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+@keyframes ripplePulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.01);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.ripple-container {
+    font-family: 'Creepster', cursive;
+    color: #8A0303;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+/* ease-in-out*/
+.heartbeat {
+    animation: heartbeat 5.5s infinite;
+}
+
+.ripple-char {
+    display: inline-block;
 }

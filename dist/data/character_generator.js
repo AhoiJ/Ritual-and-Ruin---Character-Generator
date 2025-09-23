@@ -120,3 +120,43 @@ export function setCurrentSanity(value) {
 export function setRitualTriggered(value) {
     ritualTriggered = value;
 }
+function toFullWidth(text) {
+    return [...text].map(char => {
+        const code = char.charCodeAt(0);
+        return (code >= 33 && code <= 126) ? String.fromCharCode(code + 0xFF00 - 0x20) : char;
+    }).join('');
+}
+export function buildCharacterText() {
+    const isInsane = currentSanity <= 0;
+    const asciiArt = isInsane
+        ? toFullWidth("THRALL OF THE ELDER ONE")
+        : getAsciiBanner(characterOccupation);
+    let statsBlock = "";
+    Object.entries(characterStats).forEach(([stat, value]) => {
+        statsBlock += `${stat}: ${value}\n`;
+    });
+    const cleanedSupportDetails = supportDetails.map(line => {
+        const match = line.match(/^(.+?) \(([^,]+), (.+)\)$/);
+        if (!match)
+            return line;
+        const name = match[1];
+        const effect = match[3];
+        return `${name}: ${effect}`;
+    });
+    return `
+${asciiArt}
+
+Name: ${characterName}
+Occupation: ${characterOccupation}
+HP: ${currentHp}/${maxHp}
+Sanity: ${currentSanity}/${maxSanity}
+
+${statsBlock}
+Inventory:
+- Weapons: ${weaponDetails.join('\n  - ')}
+- Support: 
+  - ${cleanedSupportDetails.join('\n  - ')}
+- Occupation Items: 
+  - ${occupationItemsList.join('\n  - ')}
+`;
+}
