@@ -9,25 +9,32 @@
 
 <body>
     <div id="container">
-        <!-- Optional canvas layer if you're using effects -->
-        <canvas id="parchmentCanvas"></canvas>
+        <div id="journalWrapper">
+            <div id="journalBackground">
+                <canvas id="parchmentCanvas"></canvas>
 
-        <!-- Journal background wrapper -->
-        <div id="journalBackground">
-            <div id="characterOutput">
-                <pre id="characterText"></pre>
-                <!-- for insanity effects -->
-                <div id="ritualOverlayContainer"></div>
-                <pre id="sanityWhisperText"></pre>
-                <div id="whisperText"></div>
+                <div id="characterOutput">
+                    <pre id="characterText"></pre>
+                    <div id="ritualOverlayContainer"></div>
+                    <pre id="sanityWhisperText"></pre>
+                    <div id="whisperText"></div>
+                </div>
+            </div>
+
+            <div id="postItColumn">
+                <div class="post-it-wrapper">
+                    <img src="assets/postit.png" class="post-it" alt="Post-it 1" />
+                    <p class="post-it-text" id="traitNote1"></p>
+                </div>
+                <div class="post-it-wrapper">
+                    <img src="assets/postit.png" class="post-it" alt="Post-it 2" />
+                    <p class="post-it-text" id="traitNote2"></p>
+                </div>
             </div>
         </div>
-
-        <!-- Controls fixed at top -->
         <div id="controls">
             <button id="generateBtn">Generate Character</button>
 
-            <!-- First row: HP and Sanity controls -->
             <div class="stat-controls-row">
                 <div class="stat-controls">
                     <span>HP:</span>
@@ -42,7 +49,6 @@
                 </div>
             </div>
 
-            <!-- Second row: Use and Item Management -->
             <div class="inventory-controls-row">
                 <div id="useControls" class="stat-controls">
                     <label for="itemSelect">Item:</label>
@@ -58,12 +64,13 @@
                     <button id="addItemBtn">Add</button>
                 </div>
             </div>
-
-            <!-- Whispers button fixed to bottom left -->
-            <button id="whispersBtn">Whispers from Beyond</button>
         </div>
 
-        <script type="module" src="./dist/main.js"></script>
+        <button id="whispersBtn">Whispers from Beyond</button>
+    </div>
+    <script type="module" src="./dist/main.js"></script>
 </body>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
 
 </html>

@@ -17,12 +17,71 @@ body {
     align-items: center;
     justify-content: flex-start;
     padding: 2rem;
+    padding-top: 80px;
     height: 100%;
     width: 100%;
     overflow-y: auto;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
     position: relative;
 }
+
+/* Center journal and float post-its beside it */
+#journalWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 2rem;
+}
+
+#postItColumn {
+    position: absolute;
+    left: -300px;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.post-it-wrapper {
+    position: relative;
+    width: 360px;
+    height: auto;
+}
+
+.post-it {
+    width: 360px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    display: block;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.post-it-text {
+    position: absolute;
+    transform: rotate(-7deg);
+    top: 100px;
+    left: 75px;
+    right: 20px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1rem;
+    color: #27221f;
+    line-height: 1.2;
+    margin: 0;
+    word-wrap: break-word;
+    pointer-events: none;
+    /* optional: prevents accidental clicks */
+    white-space: pre-line;
+
+}
+
+/* remember to add this to new wrappers yms yms
+.post-it:nth-child(2) {
+    margin-top: -120px;
+    transform: rotate(1.5deg);
+}
+    */
 
 /* Journal Background */
 #journalBackground {
@@ -36,19 +95,31 @@ body {
     z-index: 1;
 }
 
+#parchmentCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 700px;
+    height: 900px;
+    z-index: 0;
+    margin: 0;
+    padding: 0;
+    display: block;
+}
+
 /* Character Output */
 #characterOutput {
     font-family: 'Courier New', monospace;
     font-weight: bold;
     font-size: 1rem;
     white-space: pre-wrap;
-    text-align: left;
-    width: 80%;
-    padding: 0rem 4rem 2rem 8rem;
-    margin: 0;
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2rem;
+    margin-left: 5rem;
     z-index: 2;
-    overflow: hidden;
 }
 
 #characterText {
@@ -166,7 +237,7 @@ button:hover,
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     pointer-events: none;
     z-index: 10;
     overflow: hidden;
@@ -174,14 +245,15 @@ button:hover,
 
 .ritualFragment {
     position: absolute;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: #1a1a1a;
+    color: #990F02;
+    font-family: 'Creepster', cursive;
+    font-size: 1rem;
     opacity: 1;
     white-space: nowrap;
-    transition: opacity 2s ease-in-out;
+    transition: opacity 1s ease;
+    pointer-events: none;
 }
+
 
 /* ASCII Banner Centering */
 pre::first-line {

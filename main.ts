@@ -1,4 +1,4 @@
-import { whispers, sanityWhisper } from './data/whispers.js';
+import { whispers, sanityWhisper, traits, fears } from './data/whispers.js';
 import { ritualCorruption } from "./data/corrupt_sanity.js";
 import {
     generateCharacterData,
@@ -36,6 +36,32 @@ import {
 const whispersBtn = document.getElementById("whispersBtn");
 const whisperText = document.getElementById("whisperText");
 
+function updatePostItNotes() {
+    const shuffledTraits = traits.sort(() => 0.5 - Math.random());
+    const shuffledFears = fears.sort(() => 0.5 - Math.random());
+
+    const traitCount = Math.floor(Math.random() * 3) + 2; // 2 to 4
+    const fearCount = Math.floor(Math.random() * 3) + 1;  // 1 to 3
+
+    const selectedTraits = shuffledTraits.slice(0, traitCount);
+    const selectedFears = shuffledFears.slice(0, fearCount);
+
+    const note1 = document.getElementById("traitNote1");
+    const note2 = document.getElementById("traitNote2");
+
+    const traitText = selectedTraits.join("\n");
+    const fearText = selectedFears.join("\n");
+
+    if (note1) {
+        note1.innerHTML = "";
+        typeWriterEffect(note1, traitText, 40, true);
+    }
+
+    if (note2) {
+        note2.innerHTML = "";
+        typeWriterEffect(note2, fearText, 40, true);
+    }
+}
 
 export function renderCharacter(output: HTMLElement, useTypewriter: boolean = true): void {
     const asciiArt = getAsciiBanner(characterOccupation);
@@ -79,6 +105,7 @@ Inventory:
     if (useTypewriter) {
         characterText.textContent = "";
         typeWriterEffect(characterText, character, 25);
+        updatePostItNotes();
     } else {
         characterText.textContent = character;
     }

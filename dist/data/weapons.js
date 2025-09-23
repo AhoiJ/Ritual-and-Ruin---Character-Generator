@@ -22,7 +22,7 @@ export const combatItems = {
     // 🏥 Medical Gear
     "First Aid Kit": { type: "medical", damage: "heal 1d6", uses: 3 },
     "Morphine Syringe": { type: "medical", damage: "heal 1d4", uses: 1 },
-    "Bandage Roll": { type: "medical", damage: "heal 1d4", uses: 5 },
+    "Bandage Roll": { type: "medical", damage: "heal 1d4", uses: 2 },
     "Cocaine": { type: "medical", damage: "sanity +1d4", uses: 1 },
     // 🛡 Tactical Gear
     "Gas Mask": { type: "tactical", damage: "nullify gas", uses: 10 },

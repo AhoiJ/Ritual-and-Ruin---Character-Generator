@@ -80,7 +80,18 @@ export function ritualCorruption(target: HTMLElement): void {
             target.scrollTop = target.scrollHeight;
             i++;
             setTimeout(corrupt, slowDelay); // medium phase
-        } else if (i < fragments.length) {
+        } else if (i === halfway) {
+            target.style.transition = "opacity 2s ease";
+            target.style.opacity = "0";
+
+            setTimeout(() => {
+                target.textContent = "";
+                target.style.opacity = "1";
+                i++; // ← advance to next fragment
+                corrupt(); // continue with overlay phase
+            }, 2000);
+        }
+        else if (i < fragments.length) {
             overlayFragment(fragments[i]);
             i++;
             setTimeout(corrupt, overlayDelay); // fast overlay phase
@@ -113,8 +124,8 @@ export function ritualCorruption(target: HTMLElement): void {
         div.textContent = text;
 
         // Fully randomized positions, clamped to avoid clipping
-        const top = Math.random() * 80 + 10;  // 10%–90% vertical
-        const left = Math.random() * 80 + 10; // 10%–90% horizontal
+        const top = Math.random() * 70 + 10;  // 10%–80% vertical
+        const left = Math.random() * 40 + 10; // 10%–50% horizontal
 
         div.style.top = `${top}%`;
         div.style.left = `${left}%`;
