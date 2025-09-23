@@ -1,105 +1,9 @@
 var _a, _b;
-import { firstNames, lastNames } from './data/names.js';
-import { occupations, occupationItems, asciiBanners } from './data/occupations.js';
-import { combatItems } from './data/weapons.js';
 import { whispers } from './data/whispers.js';
 import { ritualCorruption } from "./data/corrupt_sanity.js";
+import { generateCharacterData, setCurrentHp, setCurrentSanity, currentHp, maxHp, currentSanity, maxSanity, characterName, characterOccupation, characterStats, weaponDetails, supportDetails, occupationItemsList, getAsciiBanner, itemSelect, rebuildItemDetails, supportNames, itemUses, ritualTriggered, setRitualTriggered } from './data/character_generator.js';
 const whispersBtn = document.getElementById("whispersBtn");
 const whisperText = document.getElementById("whisperText");
-const itemSelect = document.getElementById("itemSelect");
-let currentHp = 0;
-let maxHp = 0;
-let currentSanity = 0;
-let maxSanity = 0;
-let ritualTriggered = false;
-let supportNames = [];
-let itemUses = {};
-let characterStats;
-let characterName = "";
-let characterOccupation = "";
-let weaponDetails = [];
-let supportDetails = [];
-let occupationItemsList = [];
-function formatItemLine(name, type, damage, uses, maxLength = 25) {
-    const details = `(${type}, ${damage}, uses: ${uses})`;
-    return name.length > maxLength
-        ? `${name}\n  ${details}`
-        : `${name} ${details}`;
-}
-const meleeWeapons = Object.entries(combatItems)
-    .filter(([_, data]) => data.type === "melee")
-    .map(([name]) => name);
-const rangedWeapons = Object.entries(combatItems)
-    .filter(([_, data]) => data.type === "ranged")
-    .map(([name]) => name);
-const weaponPool = [...meleeWeapons, ...rangedWeapons];
-const supportItems = Object.entries(combatItems)
-    .filter(([_, data]) => ["explosive", "medical", "tactical"].includes(data.type))
-    .map(([name]) => name);
-function generateName() {
-    const first = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const last = lastNames[Math.floor(Math.random() * lastNames.length)];
-    return `${first} ${last}`;
-}
-function generateStat(min = 25, max = 85, step = 5) {
-    const range = Math.floor((max - min) / step) + 1;
-    const value = Math.floor(Math.random() * range);
-    return min + value * step;
-}
-function generateCharacterData() {
-    const characterText = document.getElementById("characterText");
-    if (characterText) {
-        characterText.style.opacity = "1";
-        characterText.classList.remove("corrupted");
-    }
-    ritualTriggered = false;
-    itemUses = {};
-    maxHp = Math.floor(Math.random() * 9) + 7;
-    currentHp = maxHp;
-    maxSanity = Math.floor(Math.random() * 6) + 5;
-    currentSanity = maxSanity;
-    characterName = generateName();
-    characterOccupation = occupations[Math.floor(Math.random() * occupations.length)];
-    characterStats = {
-        Strength: generateStat(),
-        Dexterity: generateStat(),
-        Perception: generateStat(),
-        Knowledge: generateStat()
-    };
-    const weaponChance = Math.random() < 0.05;
-    const weapons = weaponChance
-        ? getRandomSample(weaponPool, 1)
-        : [weaponPool[Math.floor(Math.random() * weaponPool.length)]];
-    weaponDetails = weapons.map(name => {
-        const w = combatItems[name];
-        itemUses[name] = { current: w.uses, max: w.uses };
-        return formatItemLine(name, w.type, w.damage, w.uses);
-    });
-    supportNames = getRandomSample(supportItems, Math.floor(Math.random() * 4));
-    supportDetails = supportNames.map(name => {
-        const item = combatItems[name];
-        if (item.uses) {
-            itemUses[name] = { current: item.uses, max: item.uses };
-        }
-        return formatItemLine(name, item.type, item.damage, item.uses);
-    });
-    occupationItemsList = getRandomSample(occupationItems[characterOccupation] || [], Math.floor(Math.random() * 3) + 2);
-    itemSelect.innerHTML = ""; // clear previous
-    Object.keys(itemUses).forEach(name => {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = `${name} (${itemUses[name].current}/${itemUses[name].max})`;
-        itemSelect.appendChild(option);
-    });
-}
-function getAsciiBanner(occupation) {
-    for (const key in asciiBanners) {
-        if (occupation.toLowerCase().includes(key.toLowerCase())) {
-            return asciiBanners[key];
-        }
-    }
-    return asciiBanners["Default"];
-}
 function renderCharacter(output, useTypewriter = true) {
     const asciiArt = getAsciiBanner(characterOccupation);
     // 🧠 Build stats block
@@ -143,10 +47,6 @@ Inventory:
         characterText.textContent = character;
     }
 }
-function getRandomSample(arr, count) {
-    const shuffled = [...arr].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-}
 function typeWriterEffect(element, text, speed = 30, append = false) {
     if (!append)
         element.textContent = "";
@@ -168,18 +68,6 @@ function checkSanityWhisper() {
         ritualCorruption(characterText);
     }
 }
-function rebuildItemDetails() {
-    weaponDetails = Object.keys(itemUses)
-        .filter(name => combatItems[name].type === "melee" || combatItems[name].type === "ranged")
-        .map(name => {
-        const item = combatItems[name];
-        return formatItemLine(name, item.type, item.damage, itemUses[name].current);
-    });
-    supportDetails = supportNames.map(name => {
-        const item = combatItems[name];
-        return formatItemLine(name, item.type, item.damage, itemUses[name].current);
-    });
-}
 document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('characterOutput');
     const button = document.getElementById('generateBtn');
@@ -195,29 +83,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     hpMinus === null || hpMinus === void 0 ? void 0 : hpMinus.addEventListener('click', () => {
         if (output && currentHp > 0) {
-            currentHp--;
+            setCurrentHp(currentHp - 1);
             renderCharacter(output, false); // Instant update
         }
     });
     hpPlus === null || hpPlus === void 0 ? void 0 : hpPlus.addEventListener('click', () => {
         if (output && currentHp < maxHp) {
-            currentHp++;
+            setCurrentHp(currentHp + 1);
             renderCharacter(output, false);
         }
     });
     sanityMinus === null || sanityMinus === void 0 ? void 0 : sanityMinus.addEventListener('click', () => {
         if (output && currentSanity > 0) {
-            currentSanity--;
+            setCurrentSanity(currentSanity - 1);
             renderCharacter(output, false);
             if (currentSanity === 0 && !ritualTriggered) {
-                ritualTriggered = true;
+                setRitualTriggered(true);
                 checkSanityWhisper(); // or ritualCorruption()
             }
         }
     });
     sanityPlus === null || sanityPlus === void 0 ? void 0 : sanityPlus.addEventListener('click', () => {
         if (output && currentSanity < maxSanity && currentSanity > 0) {
-            currentSanity++;
+            setCurrentSanity(currentSanity + 1);
             renderCharacter(output, false);
         }
     });
