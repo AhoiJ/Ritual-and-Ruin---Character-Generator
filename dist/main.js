@@ -1,10 +1,11 @@
 var _a, _b;
 import { whispers } from './data/whispers.js';
 import { ritualCorruption } from "./data/corrupt_sanity.js";
-import { generateCharacterData, setCurrentHp, setCurrentSanity, currentHp, maxHp, currentSanity, maxSanity, characterName, characterOccupation, characterStats, weaponDetails, supportDetails, occupationItemsList, getAsciiBanner, itemSelect, rebuildItemDetails, supportNames, itemUses, ritualTriggered, setRitualTriggered } from './data/character_generator.js';
+import { generateCharacterData, setCurrentHp, setCurrentSanity, currentHp, maxHp, currentSanity, maxSanity, characterName, characterOccupation, characterStats, weaponDetails, supportDetails, occupationItemsList, getAsciiBanner, itemSelect, rebuildItemDetails, supportNames, ritualTriggered, setRitualTriggered } from './data/character_generator.js';
+import { useItem, reloadItem, getItemUses, populateAddItemDropdown, setupItemManagement } from './data/item_manager.js';
 const whispersBtn = document.getElementById("whispersBtn");
 const whisperText = document.getElementById("whisperText");
-function renderCharacter(output, useTypewriter = true) {
+export function renderCharacter(output, useTypewriter = true) {
     const asciiArt = getAsciiBanner(characterOccupation);
     // 🧠 Build stats block
     let statsBlock = "";
@@ -123,16 +124,17 @@ whispersBtn === null || whispersBtn === void 0 ? void 0 : whispersBtn.addEventLi
         whisperText.style.opacity = "0";
     }, 3000);
 });
+function refreshCharacter() {
+    rebuildItemDetails();
+    const output = document.getElementById("characterOutput");
+    if (output)
+        renderCharacter(output, false);
+}
 (_a = document.getElementById("useBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
-    var _a;
     const selected = itemSelect.value;
-    if (((_a = itemUses[selected]) === null || _a === void 0 ? void 0 : _a.current) > 0) {
-        itemUses[selected].current--;
+    if (useItem(selected)) {
         updateDropdownLabel(selected);
-        rebuildItemDetails();
-        const output = document.getElementById("characterOutput");
-        if (output)
-            renderCharacter(output, false);
+        refreshCharacter();
     }
 });
 function triggerWhisper(message) {
@@ -146,32 +148,27 @@ function triggerWhisper(message) {
         whisperText.style.opacity = "0";
     }, 3000);
 }
-function hasAmmoPouch() {
-    return supportNames.includes("Ammo Pouch");
-}
 (_b = document.getElementById("reloadBtn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
     const selected = itemSelect.value;
-    const item = itemUses[selected];
-    if (!item)
-        return;
-    if (item.current < item.max) {
-        const refill = hasAmmoPouch()
-            ? item.max
-            : Math.max(1, Math.floor(item.max / 3));
-        item.current = Math.min(item.current + refill, item.max);
-        updateDropdownLabel(selected);
-        rebuildItemDetails();
-        const output = document.getElementById("characterOutput");
-        if (output)
-            renderCharacter(output, false);
-        triggerWhisper("The weapon feels reliable... for now");
-    }
+    const hasPouch = supportNames.includes("Ammo Pouch");
+    reloadItem(selected, hasPouch);
+    triggerWhisper("The weapon feels reliable... for now");
+    updateDropdownLabel(selected);
+    refreshCharacter();
 });
 function updateDropdownLabel(name) {
     const options = itemSelect.options;
     for (let i = 0; i < options.length; i++) {
         if (options[i].value === name) {
-            options[i].textContent = `${name} (${itemUses[name].current}/${itemUses[name].max})`;
+            options[i].textContent = `${name} (${getItemUses(name)})`;
         }
     }
 }
+document.addEventListener('DOMContentLoaded', () => {
+    const output = document.getElementById('characterOutput');
+    const addItemSelect = document.getElementById('addItemSelect');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const removeItemBtn = document.getElementById('removeItemBtn');
+    populateAddItemDropdown(addItemSelect);
+    setupItemManagement(addItemBtn, removeItemBtn, addItemSelect, output);
+});

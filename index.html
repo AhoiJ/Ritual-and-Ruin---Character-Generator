@@ -27,33 +27,43 @@
         <div id="controls">
             <button id="generateBtn">Generate Character</button>
 
-            <div class="stat-controls">
-                <span>HP:</span>
-                <button id="hpMinus">−</button>
-                <button id="hpPlus">+</button>
+            <!-- First row: HP and Sanity controls -->
+            <div class="stat-controls-row">
+                <div class="stat-controls">
+                    <span>HP:</span>
+                    <button id="hpMinus">−</button>
+                    <button id="hpPlus">+</button>
+                </div>
+
+                <div class="stat-controls">
+                    <span>Sanity:</span>
+                    <button id="sanityMinus">−</button>
+                    <button id="sanityPlus">+</button>
+                </div>
             </div>
 
-            <div class="stat-controls">
-                <span>Sanity:</span>
-                <button id="sanityMinus">−</button>
-                <button id="sanityPlus">+</button>
+            <!-- Second row: Use and Item Management -->
+            <div class="inventory-controls-row">
+                <div id="useControls" class="stat-controls">
+                    <label for="itemSelect">Item:</label>
+                    <select id="itemSelect"></select>
+                    <button id="useBtn">Use</button>
+                    <button id="reloadBtn">Reload</button>
+                    <button id="removeItemBtn">Remove</button>
+                </div>
+
+                <div id="itemManagement" class="stat-controls">
+                    <label for="addItemSelect">Add Item:</label>
+                    <select id="addItemSelect"></select>
+                    <button id="addItemBtn">Add</button>
+                </div>
             </div>
 
-            <div id="useControls" class="stat-controls">
-                <label for="itemSelect">Item:</label>
-                <select id="itemSelect"></select>
-
-                <button id="useBtn">Use</button>
-                <button id="reloadBtn">Reload</button>
-            </div>
-
+            <!-- Whispers button fixed to bottom left -->
+            <button id="whispersBtn">Whispers from Beyond</button>
         </div>
-        <!-- Whispers button fixed to bottom left -->
-        <button id="whispersBtn">Whispers from Beyond</button>
 
-    </div>
-
-    <script type="module" src="./dist/main.js"></script>
+        <script type="module" src="./dist/main.js"></script>
 </body>
 
 </html>

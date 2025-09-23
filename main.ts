@@ -22,12 +22,22 @@ import {
     ritualTriggered,
     setRitualTriggered
 } from './data/character_generator.js';
+import {
+    addItem,
+    removeItem,
+    useItem,
+    reloadItem,
+    getItemUses,
+    populateAddItemDropdown,
+    setupItemManagement
+} from './data/item_manager.js';
+
 
 const whispersBtn = document.getElementById("whispersBtn");
 const whisperText = document.getElementById("whisperText");
 
 
-function renderCharacter(output: HTMLElement, useTypewriter: boolean = true): void {
+export function renderCharacter(output: HTMLElement, useTypewriter: boolean = true): void {
     const asciiArt = getAsciiBanner(characterOccupation);
 
     // 🧠 Build stats block
@@ -98,8 +108,6 @@ function checkSanityWhisper(): void {
     }
 }
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('characterOutput');
     const button = document.getElementById('generateBtn');
@@ -165,14 +173,17 @@ whispersBtn?.addEventListener("click", () => {
     }, 3000);
 });
 
+function refreshCharacter(): void {
+    rebuildItemDetails();
+    const output = document.getElementById("characterOutput");
+    if (output) renderCharacter(output, false);
+}
+
 document.getElementById("useBtn")?.addEventListener("click", () => {
     const selected = itemSelect.value;
-    if (itemUses[selected]?.current > 0) {
-        itemUses[selected].current--;
+    if (useItem(selected)) {
         updateDropdownLabel(selected);
-        rebuildItemDetails();
-        const output = document.getElementById("characterOutput");
-        if (output) renderCharacter(output, false);
+        refreshCharacter();
     }
 });
 
@@ -189,34 +200,30 @@ function triggerWhisper(message?: string): void {
     }, 3000);
 }
 
-function hasAmmoPouch(): boolean {
-    return supportNames.includes("Ammo Pouch");
-}
-
 document.getElementById("reloadBtn")?.addEventListener("click", () => {
     const selected = itemSelect.value;
-    const item = itemUses[selected];
-    if (!item) return;
-
-    if (item.current < item.max) {
-        const refill = hasAmmoPouch()
-            ? item.max
-            : Math.max(1, Math.floor(item.max / 3));
-
-        item.current = Math.min(item.current + refill, item.max);
-        updateDropdownLabel(selected);
-        rebuildItemDetails();
-        const output = document.getElementById("characterOutput");
-        if (output) renderCharacter(output, false);
-        triggerWhisper("The weapon feels reliable... for now");
-    }
+    const hasPouch = supportNames.includes("Ammo Pouch");
+    reloadItem(selected, hasPouch);
+    triggerWhisper("The weapon feels reliable... for now");
+    updateDropdownLabel(selected);
+    refreshCharacter();
 });
 
-function updateDropdownLabel(name: string) {
+function updateDropdownLabel(name: string): void {
     const options = itemSelect.options;
     for (let i = 0; i < options.length; i++) {
         if (options[i].value === name) {
-            options[i].textContent = `${name} (${itemUses[name].current}/${itemUses[name].max})`;
+            options[i].textContent = `${name} (${getItemUses(name)})`;
         }
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const output = document.getElementById('characterOutput')!;
+    const addItemSelect = document.getElementById('addItemSelect') as HTMLSelectElement;
+    const addItemBtn = document.getElementById('addItemBtn')!;
+    const removeItemBtn = document.getElementById('removeItemBtn')!;
+
+    populateAddItemDropdown(addItemSelect);
+    setupItemManagement(addItemBtn, removeItemBtn, addItemSelect, output);
+});

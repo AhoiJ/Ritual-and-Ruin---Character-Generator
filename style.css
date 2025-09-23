@@ -1,4 +1,4 @@
-/* Reset and base styles */
+/* Base Reset and Background */
 html,
 body {
     margin: 0;
@@ -7,14 +7,10 @@ body {
     width: 100%;
     font-family: 'Georgia', serif;
     color: #1a1a1a;
-    background-image: url('assets/desk.png');
-    /* 👈 full-screen desk background */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: url('assets/desk.png') center/cover no-repeat;
 }
 
-/* Container stacks content vertically */
+/* Layout Container */
 #container {
     display: flex;
     flex-direction: column;
@@ -28,77 +24,92 @@ body {
     position: relative;
 }
 
+/* Journal Background */
 #journalBackground {
-    background-image: url('assets/paper.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url('assets/paper.png') center/100% 100% no-repeat;
     width: 700px;
     height: 900px;
     display: flex;
-    justify-content: center;
-    /* 👈 center horizontally */
     align-items: flex-start;
-    /* 👈 center vertically */
-    padding: 0;
-    /* 👈 remove offset padding */
+    justify-content: center;
     position: relative;
     z-index: 1;
 }
 
+/* Character Output */
 #characterOutput {
     font-family: 'Courier New', monospace;
     font-weight: bold;
+    font-size: 1rem;
     white-space: pre-wrap;
     text-align: left;
     width: 80%;
-    margin: 0;
-    /* top, right, bottom, left */
     padding: 0rem 4rem 2rem 8rem;
-    z-index: 2;
+    margin: 0;
     position: relative;
+    z-index: 2;
     overflow: hidden;
 }
 
-/* Inner text block */
 #characterText {
-    font-family: inherit;
     white-space: pre-wrap;
     margin: 0;
     padding: 0;
     transition: opacity 2s ease-in-out;
 }
 
-/* Controls fixed to bottom */
+/* Controls Bar */
 #controls {
     position: fixed;
-    top: 0rem;
+    top: 0;
     left: 0;
     right: 0;
     display: flex;
     justify-content: center;
     gap: 2rem;
-    font-family: 'Georgia', serif;
     background-color: rgba(30, 30, 30, 0.8);
     padding: 1rem;
     z-index: 100;
 }
 
-/* Stat control layout */
-.stat-controls {
+/* Control Rows */
+.stat-controls-row,
+.inventory-controls-row {
     display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+/* Control Blocks with aligned columns */
+.stat-controls,
+#useControls,
+#itemManagement {
+    display: grid;
+    grid-template-columns: 80px 1fr auto auto auto;
     align-items: center;
     gap: 0.5rem;
 }
 
+.stat-controls label,
 .stat-controls span {
     font-weight: bold;
     font-size: 1rem;
     color: #ffffff;
 }
 
-/* Button styling */
-button {
+/* Selects */
+#itemSelect,
+#addItemSelect {
+    min-width: 180px;
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    padding: 0.4rem;
+}
+
+/* Buttons */
+button,
+#whispersBtn {
     padding: 0.4rem 0.8rem;
     font-size: 1rem;
     cursor: pointer;
@@ -108,79 +119,48 @@ button {
     font-family: 'Georgia', serif;
 }
 
-button:hover {
-    background-color: #d6c8a9;
-}
-
-/* Optional: center ASCII banner using spaces */
-pre::first-line {
-    text-align: center;
-}
-
-#whispersBtn {
-    position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    padding: 0.6rem 1rem;
-    font-size: 1rem;
-    cursor: pointer;
-    background-color: #e0d4b7;
-    border: 1px solid #8b7d6b;
-    border-radius: 4px;
-    font-family: 'Georgia', serif;
-    z-index: 101;
-}
-
+button:hover,
 #whispersBtn:hover {
     background-color: #d6c8a9;
 }
 
-#whisperText {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Georgia', serif;
-    font-size: 1rem;
-    color: #5a4a3a;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    pointer-events: none;
-    white-space: pre-wrap;
-    text-align: center;
-    z-index: 3;
+/* Whispers Button */
+#whispersBtn {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 101;
 }
 
-#useControls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: 2rem;
-    color: #ffffff;
-}
-
-#itemSelect {
-    font-family: 'Georgia', serif;
-    padding: 0.4rem;
-    font-size: 1rem;
-}
-
+/* Whisper Text */
+#whisperText,
 #sanityWhisperText {
     position: absolute;
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
+    font-size: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    white-space: pre-wrap;
+    text-align: center;
+    transition: opacity 1s ease-in-out;
+    z-index: 5;
+}
+
+#whisperText {
+    font-family: 'Georgia', serif;
+    color: #5a4a3a;
+}
+
+#sanityWhisperText {
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
     color: #5a4a3a;
-    opacity: 0;
-    white-space: pre-wrap;
-    text-align: center;
-    pointer-events: none;
-    z-index: 5;
     transition: opacity 2s ease-in-out;
 }
 
+/* Ritual Overlay */
 #ritualOverlayContainer {
     position: absolute;
     top: 0;
@@ -196,13 +176,19 @@ pre::first-line {
     position: absolute;
     font-family: 'Courier New', monospace;
     font-size: 0.9rem;
-    color: #1a1a1a;
     font-weight: bold;
+    color: #1a1a1a;
     opacity: 1;
     white-space: nowrap;
     transition: opacity 2s ease-in-out;
 }
 
+/* ASCII Banner Centering */
+pre::first-line {
+    text-align: center;
+}
+
+/* Ritual Fragment Animation */
 @keyframes fragmentFade {
     0% {
         opacity: 0;
