@@ -217,6 +217,10 @@ export const asciiBanners: Record<string, string> = {
 ║  Target File – Hunter Authorization    ║
 ╚════════════════════════════════════════╝`,
 
+    "Corrupted": `╔══════════════════════════════════╗
+║                         THRALL OF THE ELDER ONE                              ║
+╚══════════════════════════════════╝`,
+
     "Default": `╔════════════════════════════════════════╗
 ║  Character Manifest – Arkham Registry  ║
 ╚════════════════════════════════════════╝`

@@ -174,6 +174,9 @@ export const asciiBanners = {
     "Bounty Hunter": `╔════════════════════════════════════════╗
 ║  Target File – Hunter Authorization    ║
 ╚════════════════════════════════════════╝`,
+    "Corrupted": `╔══════════════════════════════════╗
+║                         THRALL OF THE ELDER ONE                              ║
+╚══════════════════════════════════╝`,
     "Default": `╔════════════════════════════════════════╗
 ║  Character Manifest – Arkham Registry  ║
 ╚════════════════════════════════════════╝`

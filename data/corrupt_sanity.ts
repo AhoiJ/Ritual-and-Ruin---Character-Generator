@@ -1,5 +1,6 @@
 
-export function ritualCorruption(target: HTMLElement): void {
+export function ritualCorruption(target: HTMLElement, onComplete?: () => void): void {
+    target.classList.add("ritual-mode");
     const fragments = [
         "The veil thins",
         "Echoes coil beneath your skin",
@@ -109,6 +110,7 @@ export function ritualCorruption(target: HTMLElement): void {
 
                     setTimeout(() => {
                         overlayContainer.innerHTML = "";
+                        if (onComplete) onComplete(); // ← trigger re-render
                     }, 2000);
                 }
             }, fadeDelay);

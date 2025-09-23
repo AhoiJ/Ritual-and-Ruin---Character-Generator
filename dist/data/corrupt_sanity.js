@@ -1,4 +1,5 @@
-export function ritualCorruption(target) {
+export function ritualCorruption(target, onComplete) {
+    target.classList.add("ritual-mode");
     const fragments = [
         "The veil thins",
         "Echoes coil beneath your skin",
@@ -104,6 +105,8 @@ export function ritualCorruption(target) {
                     });
                     setTimeout(() => {
                         overlayContainer.innerHTML = "";
+                        if (onComplete)
+                            onComplete(); // ← trigger re-render
                     }, 2000);
                 }
             }, fadeDelay);
@@ -117,7 +120,7 @@ export function ritualCorruption(target) {
         div.className = "ritualFragment";
         div.textContent = text;
         // Fully randomized positions, clamped to avoid clipping
-        const top = Math.random() * 80 + 10; // 10%–90% vertical
+        const top = Math.random() * 70 + 10; // 10%–80% vertical
         const left = Math.random() * 40 + 10; // 10%–50% horizontal
         div.style.top = `${top}%`;
         div.style.left = `${left}%`;

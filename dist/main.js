@@ -26,8 +26,10 @@ function updatePostItNotes() {
     }
 }
 export function renderCharacter(output, useTypewriter = true) {
-    const asciiArt = getAsciiBanner(characterOccupation);
-    // 🧠 Build stats block
+    const isInsane = currentSanity <= 0;
+    const asciiArt = isInsane
+        ? getAsciiBanner("Corrupted")
+        : getAsciiBanner(characterOccupation);
     let statsBlock = "";
     Object.entries(characterStats).forEach(([stat, value]) => {
         statsBlock += `${stat}: ${value}\n`;
@@ -35,12 +37,11 @@ export function renderCharacter(output, useTypewriter = true) {
     const cleanedSupportDetails = supportDetails.map(line => {
         const match = line.match(/^(.+?) \(([^,]+), (.+)\)$/);
         if (!match)
-            return line; // fallback if format doesn't match
-        const name = match[1]; // "First Aid Kit"
-        const effect = match[3]; // "heal 1d6, uses: 3"
+            return line;
+        const name = match[1];
+        const effect = match[3];
         return `${name}: ${effect}`;
     });
-    // 🧾 Build full character sheet
     const character = `
 ${asciiArt}
 
@@ -60,6 +61,16 @@ Inventory:
     const characterText = document.getElementById("characterText");
     if (!characterText)
         return;
+    // Apply blood-red styling if insane
+    if (isInsane) {
+        characterText.style.color = "#8A0303"; // bloodred
+        characterText.style.fontFamily = "'Creepster', cursive"; // optional horror font
+    }
+    else {
+        characterText.style.color = "";
+        characterText.style.textShadow = "";
+        characterText.style.fontFamily = "";
+    }
     if (useTypewriter) {
         characterText.textContent = "";
         typeWriterEffect(characterText, character, 25);
@@ -87,7 +98,11 @@ function checkSanityWhisper() {
     if (!characterText)
         return;
     if (currentSanity === 0) {
-        ritualCorruption(characterText);
+        ritualCorruption(characterText, () => {
+            characterText.classList.remove("ritual-mode");
+            characterText.style.opacity = "1";
+            renderCharacter(characterText, true);
+        });
     }
 }
 document.addEventListener('DOMContentLoaded', () => {
