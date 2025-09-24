@@ -1,5 +1,6 @@
 import { whispers, sanityWhisper, traits, fears } from './data/whispers.js';
 import { ritualCorruption } from "./data/corrupt_sanity.js";
+import { combatItems, insanitySpells, WeaponType } from './data/weapons.js';
 import {
     generateCharacterData,
     setCurrentHp,
@@ -90,6 +91,33 @@ function updatePostItNotes(): void {
 
 export function renderCharacter(output: HTMLElement, useTypewriter: boolean = true): void {
     const isInsane = currentSanity <= 0;
+    if (isInsane) {
+        const spellAlreadyAdded = insanitySpells.some(spell => itemUses[spell.name]);
+        if (!spellAlreadyAdded) {
+            const spell = insanitySpells[Math.floor(Math.random() * insanitySpells.length)];
+
+            // Add to combatItems if not present
+            if (!combatItems[spell.name]) {
+                combatItems[spell.name] = {
+                    type: spell.type as WeaponType,
+                    damage: spell.damage,
+                    uses: spell.uses
+                };
+            }
+
+            // Add to itemUses and supportNames
+            itemUses[spell.name] = { current: spell.uses, max: spell.uses };
+            supportNames.push(spell.name);
+
+            // Add to dropdown
+            const option = document.createElement("option");
+            option.value = spell.name;
+            option.textContent = `${spell.name} (${spell.uses}/${spell.uses})`;
+            itemSelect.appendChild(option);
+
+            rebuildItemDetails();
+        }
+    }
     const character = buildCharacterText();
     const characterText = document.getElementById("characterText");
     if (!characterText) return;
@@ -111,6 +139,7 @@ export function renderCharacter(output: HTMLElement, useTypewriter: boolean = tr
         setTimeout(() => {
             if (isInsane) {
                 characterText.innerHTML = `<div class="ripple-container heartbeat"><pre>${character}</pre></div>`;
+                triggerWhisper("A forbidden spell claws its way into your mind...");
             }
         }, character.length * 35);
         updatePostItNotes();

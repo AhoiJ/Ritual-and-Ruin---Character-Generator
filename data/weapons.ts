@@ -44,5 +44,38 @@ export const combatItems: Record<string, Weapon> = {
     "Combat Boots": { type: "tactical", damage: "fire resistant", uses: 30 },
     "Signal Flare": { type: "tactical", damage: "alert", uses: 1 },
     "Riot Shield": { type: "tactical", damage: "block 1d6", uses: 15 },
-    "Scroll of Ryn’thar Neth-Gorgu": { type: "tactical", damage: ":", uses: 1 }
+    "Scroll of Ryn’thar Neth-Gorgu": { type: "tactical", damage: "???", uses: 1 }
 };
+
+export const insanitySpells = [
+    {
+        name: "Glyph of Spasmic Rupture",
+        type: "tactical",
+        damage: "Stun 1 turn, 1d6 damage",
+        uses: 1
+    },
+    {
+        name: "Veil of the Forgotten Eye",
+        type: "tactical",
+        damage: "Blind 2 turns",
+        uses: 1
+    },
+    {
+        name: "Chains of the Pale Maw",
+        type: "tactical",
+        damage: "Root 3 turns",
+        uses: 1
+    },
+    {
+        name: "Echo of the Hollow Flame",
+        type: "tactical",
+        damage: "1d8 fire AoE",
+        uses: 1
+    },
+    {
+        name: "Scream of the Unnamed",
+        type: "tactical",
+        damage: "Stagger all enemies 1 turn",
+        uses: 1
+    }
+];

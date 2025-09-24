@@ -29,9 +29,11 @@ function getRandomSample<T>(arr: T[], count: number): T[] {
     const shuffled = [...arr].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 }
-
 function formatItemLine(name: string, type: string, damage: string, uses: number): string {
-    const details = `(${type}, ${damage}, uses: ${uses})`;
+    const details = type === "melee"
+        ? `(${type}, ${damage})`
+        : `(${type}, ${damage}, uses: ${uses})`;
+
     return `${name} ${details}`;
 }
 

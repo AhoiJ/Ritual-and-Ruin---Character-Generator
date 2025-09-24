@@ -362,6 +362,11 @@ pre::first-line {
     animation: heartbeat 5.5s infinite;
 }
 
+.heartbeat pre {
+    font-family: 'Creepster', cursive;
+    color: #8A0303;
+}
+
 .ripple-char {
     display: inline-block;
 }
