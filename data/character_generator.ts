@@ -173,9 +173,18 @@ export function buildCharacterText(): string {
         : getAsciiBanner(characterOccupation);
 
     let statsBlock = "";
+    const statLabelWidth = 11; // longest stat name is "Perception"
     Object.entries(characterStats).forEach(([stat, value]) => {
-        statsBlock += `${stat}: ${value}\n`;
+        const half = Math.floor(value / 2);
+        const fifth = Math.floor(value / 5);
+        statsBlock += `${stat.padEnd(statLabelWidth)} ${value.toString().padEnd(3)} [${half} / ${fifth}]\n`;
     });
+    const labelWidth = 11; // longest label: "Occupation"
+    const infoBlock =
+        `${"Name:".padEnd(labelWidth)} ${characterName}\n` +
+        `${"Occupation:".padEnd(labelWidth)} ${characterOccupation}\n` +
+        `${"HP:".padEnd(labelWidth)} ${currentHp}/${maxHp}\n` +
+        `${"Sanity:".padEnd(labelWidth)} ${currentSanity}/${maxSanity}\n`;
 
     const cleanedSupportDetails = supportDetails.map(line => {
         const match = line.match(/^(.+?) \(([^,]+), (.+)\)$/);
@@ -188,11 +197,7 @@ export function buildCharacterText(): string {
     return `
 ${asciiArt}
 
-Name: ${characterName}
-Occupation: ${characterOccupation}
-HP: ${currentHp}/${maxHp}
-Sanity: ${currentSanity}/${maxSanity}
-
+${infoBlock}
 ${statsBlock}
 Inventory:
 - Weapons: ${weaponDetails.join('\n  - ')}

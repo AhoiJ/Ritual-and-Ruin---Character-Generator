@@ -110,12 +110,16 @@ export function renderCharacter(output: HTMLElement, useTypewriter: boolean = tr
         typeWriterEffect(characterText, character, 25);
         setTimeout(() => {
             if (isInsane) {
-                characterText.innerHTML = `<div class="ripple-container heartbeat">${character}</div>`;
+                characterText.innerHTML = `<div class="ripple-container heartbeat"><pre>${character}</pre></div>`;
             }
-        }, character.length * 35); // after typing ends
+        }, character.length * 35);
         updatePostItNotes();
     } else {
-        characterText.textContent = character;
+        if (isInsane) {
+            characterText.innerHTML = `<div class="ripple-container heartbeat"><pre>${character}</pre></div>`;
+        } else {
+            characterText.textContent = character;
+        }
     }
 }
 
