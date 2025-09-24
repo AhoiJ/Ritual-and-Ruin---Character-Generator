@@ -52,7 +52,17 @@ export function setupItemManagement(addBtn: HTMLElement, removeBtn: HTMLElement,
         const item = combatItems[selected];
         if (!item) return;
 
+        // Prevent duplicates
+        if (itemUses[selected]) return;
+
         addItem(selected, item.uses);
+
+        // Add to supportNames if it's a support item
+        if (["explosive", "medical", "tactical"].includes(item.type)) {
+            if (!supportNames.includes(selected)) {
+                supportNames.push(selected);
+            }
+        }
 
         const option = document.createElement("option");
         option.value = selected;
@@ -65,8 +75,15 @@ export function setupItemManagement(addBtn: HTMLElement, removeBtn: HTMLElement,
 
     removeBtn.addEventListener("click", () => {
         const selected = itemSelect.value;
+        // Remove from itemUses
         removeItem(selected);
+        // Remove from dropdown
         itemSelect.querySelector(`option[value="${selected}"]`)?.remove();
+        // Remove from supportNames if present
+        const index = supportNames.indexOf(selected);
+        if (index !== -1) {
+            supportNames.splice(index, 1);
+        }
 
         rebuildItemDetails();
         renderCharacter(output, false);

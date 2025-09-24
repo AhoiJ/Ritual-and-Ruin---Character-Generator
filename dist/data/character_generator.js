@@ -19,11 +19,9 @@ function getRandomSample(arr, count) {
     const shuffled = [...arr].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
 }
-function formatItemLine(name, type, damage, uses, maxLength = 25) {
+function formatItemLine(name, type, damage, uses) {
     const details = `(${type}, ${damage}, uses: ${uses})`;
-    return name.length > maxLength
-        ? `${name}\n  ${details}`
-        : `${name} ${details}`;
+    return `${name} ${details}`;
 }
 const meleeWeapons = Object.entries(combatItems)
     .filter(([_, data]) => data.type === "melee")

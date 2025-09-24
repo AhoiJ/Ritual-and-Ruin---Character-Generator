@@ -30,11 +30,9 @@ function getRandomSample<T>(arr: T[], count: number): T[] {
     return shuffled.slice(0, count);
 }
 
-function formatItemLine(name: string, type: string, damage: string, uses: number, maxLength = 25): string {
+function formatItemLine(name: string, type: string, damage: string, uses: number): string {
     const details = `(${type}, ${damage}, uses: ${uses})`;
-    return name.length > maxLength
-        ? `${name}\n  ${details}`
-        : `${name} ${details}`;
+    return `${name} ${details}`;
 }
 
 const meleeWeapons = Object.entries(combatItems)

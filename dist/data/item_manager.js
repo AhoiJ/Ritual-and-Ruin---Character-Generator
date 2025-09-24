@@ -1,6 +1,6 @@
 // /data/item_manager.ts
 import { combatItems } from './weapons.js';
-import { itemUses, itemSelect, rebuildItemDetails } from './character_generator.js';
+import { itemUses, itemSelect, rebuildItemDetails, supportNames } from './character_generator.js';
 import { renderCharacter } from '../main.js';
 export function addItem(name, maxUses) {
     itemUses[name] = { current: maxUses, max: maxUses };
@@ -41,7 +41,16 @@ export function setupItemManagement(addBtn, removeBtn, dropdown, output) {
         const item = combatItems[selected];
         if (!item)
             return;
+        // Prevent duplicates
+        if (itemUses[selected])
+            return;
         addItem(selected, item.uses);
+        // Add to supportNames if it's a support item
+        if (["explosive", "medical", "tactical"].includes(item.type)) {
+            if (!supportNames.includes(selected)) {
+                supportNames.push(selected);
+            }
+        }
         const option = document.createElement("option");
         option.value = selected;
         option.textContent = `${selected} (${getItemUses(selected)})`;
@@ -52,8 +61,15 @@ export function setupItemManagement(addBtn, removeBtn, dropdown, output) {
     removeBtn.addEventListener("click", () => {
         var _a;
         const selected = itemSelect.value;
+        // Remove from itemUses
         removeItem(selected);
+        // Remove from dropdown
         (_a = itemSelect.querySelector(`option[value="${selected}"]`)) === null || _a === void 0 ? void 0 : _a.remove();
+        // Remove from supportNames if present
+        const index = supportNames.indexOf(selected);
+        if (index !== -1) {
+            supportNames.splice(index, 1);
+        }
         rebuildItemDetails();
         renderCharacter(output, false);
     });
