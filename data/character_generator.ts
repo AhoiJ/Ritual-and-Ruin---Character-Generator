@@ -1,6 +1,7 @@
 import { firstNames, lastNames } from './names.js';
 import { occupations, occupationItems, asciiBanners } from './occupations.js';
-import { combatItems } from './weapons.js';
+import { combatItems, WeaponType, insanitySpells } from './weapons.js';
+import { typeWriterEffect } from '../main.js';
 
 export const itemSelect = document.getElementById("itemSelect") as HTMLSelectElement;
 
@@ -136,16 +137,25 @@ export function getAsciiBanner(occupation: string): string {
 
 export function rebuildItemDetails(): void {
     weaponDetails = Object.keys(itemUses)
-        .filter(name => combatItems[name].type === "melee" || combatItems[name].type === "ranged")
+        .filter(name => {
+            const item = combatItems[name];
+            return item && (item.type === "melee" || item.type === "ranged");
+        })
+        .map(name => {
+            const item = combatItems[name];
+            return item
+                ? formatItemLine(name, item.type, item.damage, itemUses[name].current)
+                : `${name} (missing item definition)`;
+        });
+
+    supportDetails = supportNames
+        .filter(name => combatItems[name])
         .map(name => {
             const item = combatItems[name];
             return formatItemLine(name, item.type, item.damage, itemUses[name].current);
         });
+    console.log("Support Details:", supportDetails);
 
-    supportDetails = supportNames.map(name => {
-        const item = combatItems[name];
-        return formatItemLine(name, item.type, item.damage, itemUses[name].current);
-    });
 }
 
 export function setCurrentHp(value: number): void {
@@ -206,4 +216,104 @@ Inventory:
 - Occupation Items: 
   - ${occupationItemsList.join('\n  - ')}
 `;
+}
+
+
+export function saveCharacterToStorage(): void {
+    const corruptedSpellName = insanitySpells.find(spell => itemUses[spell.name])?.name || null;
+    const corruptedSpell = corruptedSpellName
+        ? insanitySpells.find(spell => spell.name === corruptedSpellName)
+        : null;
+
+    const data = {
+        name: characterName,
+        occupation: characterOccupation,
+        stats: characterStats,
+        hp: { current: currentHp, max: maxHp },
+        sanity: { current: currentSanity, max: maxSanity },
+        items: itemUses,
+        support: supportNames,
+        occupationItems: occupationItemsList,
+        corruptedSpell: corruptedSpell
+    };
+    console.log("Saving character:", { characterName, currentSanity, itemUses });
+    localStorage.setItem("characterData", JSON.stringify(data));
+}
+
+export function loadCharacterFromStorage(): boolean {
+    const saved = localStorage.getItem("characterData");
+    if (!saved) return false;
+
+    try {
+        const data = JSON.parse(saved);
+
+        // Restore core character data
+        characterName = data.name;
+        characterOccupation = data.occupation;
+        characterStats = data.stats;
+        currentHp = data.hp.current;
+        maxHp = data.hp.max;
+        currentSanity = data.sanity.current;
+        maxSanity = data.sanity.max;
+        itemUses = data.items;
+        supportNames = data.support;
+        occupationItemsList = data.occupationItems;
+
+        // Restore corrupted spell if present
+        const corruptedSpellName = data.corruptedSpell;
+        if (corruptedSpellName && !itemUses[corruptedSpellName]) {
+            const spell = insanitySpells.find(s => s.name === corruptedSpellName);
+            if (spell) {
+                combatItems[spell.name] = {
+                    type: spell.type as WeaponType,
+                    damage: spell.damage,
+                    uses: spell.uses
+                };
+                itemUses[spell.name] = { current: spell.uses, max: spell.uses };
+                supportNames.push(spell.name);
+            }
+        }
+
+        // Rebuild item dropdown
+        itemSelect.innerHTML = "";
+        Object.keys(itemUses).forEach(name => {
+            const option = document.createElement("option");
+            option.value = name;
+            option.textContent = `${name} (${itemUses[name].current}/${itemUses[name].max})`;
+            itemSelect.appendChild(option);
+        });
+
+        // Rebuild item details
+        rebuildItemDetails();
+
+        // Restore post-it notes
+        const note1 = document.getElementById("traitNote1");
+        const note2 = document.getElementById("traitNote2");
+        const savedNote1 = localStorage.getItem("postItNote1");
+        const savedNote2 = localStorage.getItem("postItNote2");
+
+        if (note1 && savedNote1) {
+            note1.innerHTML = "";
+            note1.classList.toggle("insane-note", currentSanity <= 0);
+            typeWriterEffect(note1, savedNote1, 40, false);
+        }
+
+        if (note2 && savedNote2) {
+            note2.innerHTML = "";
+            note2.classList.toggle("insane-note", currentSanity <= 0);
+            typeWriterEffect(note2, savedNote2, 40, false);
+        }
+
+        console.log("Loading character:", {
+            characterName,
+            currentSanity,
+            itemUses,
+            corruptedSpellName
+        });
+
+        return true;
+    } catch (err) {
+        console.error("Failed to load character:", err);
+        return false;
+    }
 }

@@ -1,4 +1,4 @@
-import { whispers, sanityWhisper, traits, fears } from './data/whispers.js';
+import { whispers, traits, fears } from './data/whispers.js';
 import { ritualCorruption } from "./data/corrupt_sanity.js";
 import { combatItems, insanitySpells, WeaponType } from './data/weapons.js';
 import {
@@ -9,21 +9,17 @@ import {
     maxHp,
     currentSanity,
     maxSanity,
-    characterName,
-    characterOccupation,
-    characterStats,
-    weaponDetails,
-    supportDetails,
-    occupationItemsList,
-    getAsciiBanner,
     itemSelect,
     rebuildItemDetails,
     supportNames,
     itemUses,
     ritualTriggered,
     setRitualTriggered,
-    buildCharacterText
+    buildCharacterText,
+    loadCharacterFromStorage,
+    saveCharacterToStorage
 } from './data/character_generator.js';
+
 import {
     addItem,
     removeItem,
@@ -41,12 +37,14 @@ const whisperText = document.getElementById("whisperText");
 function updatePostItNotes(): void {
     const note1 = document.getElementById("traitNote1");
     const note2 = document.getElementById("traitNote2");
+    const killText = "Kill them all\nKill them all\nKill them all\nKill them all";
+    const methods = ["immediately", "discreetly", "gruesomely", "ceremoniously", "without hesitation", "with precision"];
+    const methodText = methods[Math.floor(Math.random() * methods.length)];
 
     if (currentSanity <= 0) {
         // Insanity mode: override with corrupted messages
-        const killText = "Kill them all\nKill them all\nKill them all\nKill them all";
-        const methods = ["immediately", "discreetly", "gruesomely", "ceremoniously", "without hesitation", "with precision"];
-        const methodText = methods[Math.floor(Math.random() * methods.length)];
+        localStorage.setItem("postItNote1", killText);
+        localStorage.setItem("postItNote2", methodText);
 
         if (note1) {
             note1.innerHTML = "";
@@ -76,6 +74,9 @@ function updatePostItNotes(): void {
     const traitText = selectedTraits.join("\n");
     const fearText = selectedFears.join("\n");
 
+    localStorage.setItem("postItNote1", traitText);
+    localStorage.setItem("postItNote2", fearText);
+
     if (note1) {
         note1.innerHTML = "";
         note1.classList.remove("insane-note");
@@ -91,41 +92,48 @@ function updatePostItNotes(): void {
 
 export function renderCharacter(output: HTMLElement, useTypewriter: boolean = true): void {
     const isInsane = currentSanity <= 0;
+
     if (isInsane) {
-        const spellAlreadyAdded = insanitySpells.some(spell => itemUses[spell.name]);
-        if (!spellAlreadyAdded) {
-            const spell = insanitySpells[Math.floor(Math.random() * insanitySpells.length)];
+        // Find existing spell or choose a new one
+        const spell = insanitySpells.find(spell => itemUses[spell.name]) ||
+            insanitySpells[Math.floor(Math.random() * insanitySpells.length)];
 
-            // Add to combatItems if not present
-            if (!combatItems[spell.name]) {
-                combatItems[spell.name] = {
-                    type: spell.type as WeaponType,
-                    damage: spell.damage,
-                    uses: spell.uses
-                };
-            }
+        // Inject into combatItems if missing
+        if (!combatItems[spell.name]) {
+            combatItems[spell.name] = {
+                type: spell.type as WeaponType,
+                damage: spell.damage,
+                uses: spell.uses
+            };
+        }
 
-            // Add to itemUses and supportNames
+        // Inject into itemUses if missing
+        if (!itemUses[spell.name]) {
             itemUses[spell.name] = { current: spell.uses, max: spell.uses };
+        }
+        // Inject into supportNames if missing
+        if (!supportNames.includes(spell.name)) {
             supportNames.push(spell.name);
+        }
 
-            // Add to dropdown
+        // Inject into dropdown if missing
+        if (!Array.from(itemSelect.options).some(opt => opt.value === spell.name)) {
             const option = document.createElement("option");
             option.value = spell.name;
             option.textContent = `${spell.name} (${spell.uses}/${spell.uses})`;
             itemSelect.appendChild(option);
-
-            rebuildItemDetails();
         }
     }
+
+    rebuildItemDetails();
     const character = buildCharacterText();
     const characterText = document.getElementById("characterText");
     if (!characterText) return;
 
     // Apply blood-red styling if insane
     if (isInsane) {
-        characterText.style.color = "#8A0303"; // bloodred
-        characterText.style.fontFamily = "'Creepster', cursive"; // optional horror font
+        characterText.style.color = "#8A0303";
+        characterText.style.fontFamily = "'Creepster', cursive";
     } else {
         characterText.classList.remove("heartbeat");
         characterText.style.color = "";
@@ -150,9 +158,11 @@ export function renderCharacter(output: HTMLElement, useTypewriter: boolean = tr
             characterText.textContent = character;
         }
     }
+
+    saveCharacterToStorage();
 }
 
-function typeWriterEffect(element: HTMLElement, text: string, speed: number = 30, append: boolean = false): void {
+export function typeWriterEffect(element: HTMLElement, text: string, speed: number = 30, append: boolean = false): void {
     if (!append) element.textContent = "";
     let i = 0;
 
@@ -301,4 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     populateAddItemDropdown(addItemSelect);
     setupItemManagement(addItemBtn, removeItemBtn, addItemSelect, output);
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+    const loaded = loadCharacterFromStorage();
+    if (loaded) {
+        renderCharacter(document.getElementById("characterOutput")!, false);
+    }
 });
