@@ -2,3 +2,7 @@ node_modules
 ideas.txt
 dist
 README.md
+/build/
+/.env
+.DS_Store
+*.log

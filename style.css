@@ -4,10 +4,16 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
+    min-height: 100vh;
     width: 100%;
     font-family: 'Georgia', serif;
     color: #1a1a1a;
     background: url('assets/desk.png') center/cover no-repeat;
+    overflow-x: hidden;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 /* Layout Container */
@@ -18,39 +24,59 @@ body {
     justify-content: flex-start;
     padding: 2rem;
     padding-top: 80px;
-    height: 100%;
     width: 100%;
+    min-height: 100vh;
+    height: auto;
     overflow-y: auto;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
     position: relative;
 }
 
-/* Center journal and float post-its beside it */
+/* Scrollable container for wide layouts */
+#scrollWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Prevent journal from shrinking */
 #journalWrapper {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 2rem;
+    min-width: 1000px;
+    /* ensures journal + post-its fit */
 }
 
+/* Horizontal layout: post-its left, journal right */
+#journalWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0rem;
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;
+}
+
+/* Post-it column aligned left */
 #postItColumn {
-    position: absolute;
-    left: -300px;
-    top: 0;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 1rem;
+    width: 280px;
+    flex-shrink: 0;
 }
 
+/* Post-it styling */
 .post-it-wrapper {
     position: relative;
-    width: 360px;
+    width: 100%;
     height: auto;
+    z-index: 10;
 }
 
 .post-it {
-    width: 360px;
+    width: 100%;
     height: auto;
     margin: 0;
     padding: 0;
@@ -62,8 +88,8 @@ body {
     position: absolute;
     transform: rotate(-7deg);
     top: 100px;
-    left: 75px;
-    right: 20px;
+    left: 20%;
+    right: 10%;
     font-family: 'Patrick Hand', cursive;
     font-size: 1rem;
     color: #27221f;
@@ -71,7 +97,6 @@ body {
     margin: 0;
     word-wrap: break-word;
     pointer-events: none;
-    /* optional: prevents accidental clicks */
     white-space: pre-line;
 }
 
@@ -84,12 +109,16 @@ body {
 #journalBackground {
     background: url('assets/paper.png') center/100% 100% no-repeat;
     width: 700px;
-    height: 900px;
+    height: auto;
+    aspect-ratio: 7 / 9;
+    max-height: 900px;
     display: flex;
     align-items: flex-start;
     justify-content: center;
     position: relative;
     z-index: 1;
+    flex-grow: 1;
+    max-width: 700px;
 }
 
 #parchmentCanvas {
@@ -97,7 +126,9 @@ body {
     top: 0;
     left: 0;
     width: 700px;
-    height: 900px;
+    height: auto;
+    aspect-ratio: 7 / 9;
+    max-height: 900px;
     z-index: 0;
     margin: 0;
     padding: 0;
@@ -158,7 +189,7 @@ body {
     margin-top: 12px;
 }
 
-/* Control Blocks with aligned columns */
+/* Control Blocks */
 .stat-controls,
 #useControls,
 #itemManagement {
@@ -201,7 +232,6 @@ button:hover,
     box-shadow: 0 0 8px #8b7d6b;
 }
 
-
 /* Whispers Button */
 #whispersBtn {
     position: fixed;
@@ -213,7 +243,6 @@ button:hover,
 .whispers-active {
     animation: pulse 1s infinite;
 }
-
 
 /* Whisper Text */
 #whisperText,
@@ -266,15 +295,7 @@ button:hover,
     pointer-events: none;
 }
 
-
-/* ASCII Banner Centering */
-pre::first-line {
-    text-align: center;
-}
-
 /* Animations */
-
-/* Ritual Fragment Animation */
 @keyframes fragmentFade {
     0% {
         opacity: 0;
@@ -307,34 +328,24 @@ pre::first-line {
 }
 
 @keyframes heartbeat {
-    0% {
-        transform: scale(1);
-    }
 
-    5% {
-        transform: scale(1.01);
-    }
-
-    10% {
-        transform: scale(1);
-    }
-
-    15% {
-        transform: scale(1.01);
-    }
-
-    20% {
-        transform: scale(1);
-    }
-
+    0%,
+    10%,
+    20%,
     100% {
         transform: scale(1);
     }
+
+    5%,
+    15% {
+        transform: scale(1.01);
+    }
 }
 
-
 @keyframes ripplePulse {
-    0% {
+
+    0%,
+    100% {
         transform: scale(1);
         opacity: 1;
     }
@@ -342,11 +353,6 @@ pre::first-line {
     50% {
         transform: scale(1.01);
         opacity: 0.8;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
     }
 }
 
@@ -357,7 +363,6 @@ pre::first-line {
     line-height: 1.4;
 }
 
-/* ease-in-out*/
 .heartbeat {
     animation: heartbeat 5.5s infinite;
 }
@@ -369,4 +374,38 @@ pre::first-line {
 
 .ripple-char {
     display: inline-block;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    #journalWrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #postItColumn {
+        width: 90vw;
+        max-width: 360px;
+        align-items: center;
+    }
+
+    #journalBackground {
+        width: 700px;
+    }
+
+    .post-it-text {
+        left: 10%;
+        right: 10%;
+        top: 80px;
+        font-size: 0.9rem;
+    }
+
+    #container {
+        padding: 1rem;
+    }
+
+    #characterOutput {
+        margin-left: 0;
+        padding: 1rem;
+    }
 }
