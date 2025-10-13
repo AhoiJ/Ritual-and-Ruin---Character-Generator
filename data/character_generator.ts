@@ -6,10 +6,14 @@ import { typeWriterEffect } from '../main.js';
 export const itemSelect = document.getElementById("itemSelect") as HTMLSelectElement;
 
 
-export let currentHp = 0;
+export const stats: Record<string, number> = {
+    hp: 0,
+    sanity: 0,
+    luck: 0,
+};
 export let maxHp = 0;
-export let currentSanity = 0;
 export let maxSanity = 0;
+export let maxLuck = 0;
 export let ritualTriggered = false;
 export let supportNames: string[] = [];
 export let itemUses: Record<string, { current: number; max: number }> = {};
@@ -77,10 +81,11 @@ export function generateCharacterData(): void {
     ritualTriggered = false;
     itemUses = {};
     maxHp = Math.floor(Math.random() * 9) + 7;
-    currentHp = maxHp;
+    stats.hp = maxHp;
     maxSanity = Math.floor(Math.random() * 6) + 5;
-    currentSanity = maxSanity;
-
+    stats.sanity = maxSanity;
+    maxLuck = 20;
+    stats.luck = maxLuck;
     characterName = generateName();
     characterOccupation = occupations[Math.floor(Math.random() * occupations.length)];
 
@@ -158,12 +163,8 @@ export function rebuildItemDetails(): void {
 
 }
 
-export function setCurrentHp(value: number): void {
-    currentHp = value;
-}
-
-export function setCurrentSanity(value: number): void {
-    currentSanity = value;
+export function setStat(statName: keyof typeof stats, value: number): void {
+    stats[statName] = value;
 }
 export function setRitualTriggered(value: boolean): void {
     ritualTriggered = value;
@@ -177,7 +178,7 @@ function toFullWidth(text: string): string {
 }
 
 export function buildCharacterText(): string {
-    const isInsane = currentSanity <= 0;
+    const isInsane = stats.sanity <= 0;
     const asciiArt = isInsane
         ? toFullWidth("THRALL OF THE ELDER ONE")
         : getAsciiBanner(characterOccupation);
@@ -193,8 +194,9 @@ export function buildCharacterText(): string {
     const infoBlock =
         `${"Name:".padEnd(labelWidth)} ${characterName}\n` +
         `${"Occupation:".padEnd(labelWidth)} ${characterOccupation}\n` +
-        `${"HP:".padEnd(labelWidth)} ${currentHp}/${maxHp}\n` +
-        `${"Sanity:".padEnd(labelWidth)} ${currentSanity}/${maxSanity}\n`;
+        `${"HP:".padEnd(labelWidth)} ${stats.hp}/${maxHp}\n` +
+        `${"Sanity:".padEnd(labelWidth)} ${stats.sanity}/${maxSanity}\n` +
+        `${"Luck:".padEnd(labelWidth)} ${stats.luck}/${maxLuck}\n`;
 
     const cleanedSupportDetails = supportDetails.map(line => {
         const match = line.match(/^(.+?) \(([^,]+), (.+)\)$/);
@@ -229,14 +231,15 @@ export function saveCharacterToStorage(): void {
         name: characterName,
         occupation: characterOccupation,
         stats: characterStats,
-        hp: { current: currentHp, max: maxHp },
-        sanity: { current: currentSanity, max: maxSanity },
+        hp: { current: stats.hp, max: maxHp },
+        sanity: { current: stats.sanity, max: maxSanity },
+        luck: { current: stats.luck, max: maxLuck },
         items: itemUses,
         support: supportNames,
         occupationItems: occupationItemsList,
         corruptedSpell: corruptedSpell
     };
-    console.log("Saving character:", { characterName, currentSanity, itemUses });
+
     localStorage.setItem("characterData", JSON.stringify(data));
 }
 
@@ -251,10 +254,12 @@ export function loadCharacterFromStorage(): boolean {
         characterName = data.name;
         characterOccupation = data.occupation;
         characterStats = data.stats;
-        currentHp = data.hp.current;
+        stats.hp = data.hp.current;
         maxHp = data.hp.max;
-        currentSanity = data.sanity.current;
+        stats.sanity = data.sanity.current;
         maxSanity = data.sanity.max;
+        stats.luck = data.luck.current;
+        maxLuck = data.luck.max;
         itemUses = data.items;
         supportNames = data.support;
         occupationItemsList = data.occupationItems;
@@ -294,22 +299,15 @@ export function loadCharacterFromStorage(): boolean {
 
         if (note1 && savedNote1) {
             note1.innerHTML = "";
-            note1.classList.toggle("insane-note", currentSanity <= 0);
+            note1.classList.toggle("insane-note", stats.sanity <= 0);
             typeWriterEffect(note1, savedNote1, 40, false);
         }
 
         if (note2 && savedNote2) {
             note2.innerHTML = "";
-            note2.classList.toggle("insane-note", currentSanity <= 0);
+            note2.classList.toggle("insane-note", stats.sanity <= 0);
             typeWriterEffect(note2, savedNote2, 40, false);
         }
-
-        console.log("Loading character:", {
-            characterName,
-            currentSanity,
-            itemUses,
-            corruptedSpellName
-        });
 
         return true;
     } catch (err) {

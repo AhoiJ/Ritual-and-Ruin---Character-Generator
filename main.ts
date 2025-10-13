@@ -3,12 +3,11 @@ import { ritualCorruption } from "./data/corrupt_sanity.js";
 import { combatItems, insanitySpells, WeaponType } from './data/weapons.js';
 import {
     generateCharacterData,
-    setCurrentHp,
-    setCurrentSanity,
-    currentHp,
+    setStat,
+    stats,
     maxHp,
-    currentSanity,
     maxSanity,
+    maxLuck,
     itemSelect,
     rebuildItemDetails,
     supportNames,
@@ -41,7 +40,7 @@ function updatePostItNotes(): void {
     const methods = ["immediately", "discreetly", "gruesomely", "ceremoniously", "without hesitation", "with precision"];
     const methodText = methods[Math.floor(Math.random() * methods.length)];
 
-    if (currentSanity <= 0) {
+    if (stats.sanity <= 0) {
         // Insanity mode: override with corrupted messages
         localStorage.setItem("postItNote1", killText);
         localStorage.setItem("postItNote2", methodText);
@@ -91,7 +90,7 @@ function updatePostItNotes(): void {
 }
 
 export function renderCharacter(output: HTMLElement, useTypewriter: boolean = true): void {
-    const isInsane = currentSanity <= 0;
+    const isInsane = stats.sanity <= 0;
 
     if (isInsane) {
         // Find existing spell or choose a new one
@@ -181,7 +180,7 @@ function checkSanityWhisper(): void {
     const characterText = document.getElementById("characterText");
     if (!characterText) return;
 
-    if (currentSanity === 0) {
+    if (stats.sanity === 0) {
         ritualCorruption(characterText, () => {
             characterText.classList.remove("ritual-mode");
             characterText.style.opacity = "1";
@@ -192,14 +191,16 @@ function checkSanityWhisper(): void {
 
 document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('characterOutput');
-    const button = document.getElementById('generateBtn');
+    const generateBtn = document.getElementById('generateBtn');
 
     const hpMinus = document.getElementById('hpMinus');
     const hpPlus = document.getElementById('hpPlus');
     const sanityMinus = document.getElementById('sanityMinus');
     const sanityPlus = document.getElementById('sanityPlus');
+    const luckMinus = document.getElementById('luckMinus');
+    const luckPlus = document.getElementById('luckPlus');
 
-    button?.addEventListener('click', () => {
+    generateBtn?.addEventListener('click', () => {
         if (output) {
             generateCharacterData();
             renderCharacter(output, true); // Use typewriter
@@ -207,24 +208,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     hpMinus?.addEventListener('click', () => {
-        if (output && currentHp > 0) {
-            setCurrentHp(currentHp - 1);
+        if (output && stats.hp > 0) {
+            setStat('hp', stats.hp - 1);
             renderCharacter(output, false); // Instant update
         }
     });
 
     hpPlus?.addEventListener('click', () => {
-        if (output && currentHp < maxHp) {
-            setCurrentHp(currentHp + 1);
+        if (output && stats.hp < maxHp) {
+            setStat('hp', stats.hp + 1);
             renderCharacter(output, false);
         }
     });
 
     sanityMinus?.addEventListener('click', () => {
-        if (output && currentSanity > 0) {
-            setCurrentSanity(currentSanity - 1);
+        if (output && stats.sanity > 0) {
+            setStat('sanity', stats.sanity - 1);
             renderCharacter(output, false);
-            if (currentSanity === 0 && !ritualTriggered) {
+            if (stats.sanity === 0 && !ritualTriggered) {
                 setRitualTriggered(true);
                 checkSanityWhisper(); // or ritualCorruption()
             }
@@ -232,8 +233,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     sanityPlus?.addEventListener('click', () => {
-        if (output && currentSanity < maxSanity && currentSanity > 0) {
-            setCurrentSanity(currentSanity + 1);
+        if (output && stats.sanity < maxSanity && stats.sanity > 0) {
+            setStat('sanity', stats.sanity + 1);
+            renderCharacter(output, false);
+        }
+    });
+
+    luckMinus?.addEventListener('click', () => {
+        if (output && stats.luck > 0) {
+            setStat('luck', stats.luck - 1);
+            renderCharacter(output, false);
+        }
+    });
+
+    luckPlus?.addEventListener('click', () => {
+        if (output && stats.luck < maxLuck) {
+            setStat('luck', stats.luck + 1);
             renderCharacter(output, false);
         }
     });
