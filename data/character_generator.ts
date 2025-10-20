@@ -22,6 +22,7 @@ export let characterStats: {
     Dexterity: number;
     Perception: number;
     Knowledge: number;
+    Movement: number;
 };
 export let characterName = "";
 export let characterOccupation = "";
@@ -93,7 +94,8 @@ export function generateCharacterData(): void {
         Strength: generateStat(),
         Dexterity: generateStat(),
         Perception: generateStat(),
-        Knowledge: generateStat()
+        Knowledge: generateStat(),
+        Movement: Math.floor(Math.random() * 5) + 4
     };
 
     const weaponChance = Math.random() < 0.05;
@@ -186,10 +188,11 @@ export function buildCharacterText(): string {
     let statsBlock = "";
     const statLabelWidth = 11; // longest stat name is "Perception"
     Object.entries(characterStats).forEach(([stat, value]) => {
-        const half = Math.floor(value / 2);
-        const fifth = Math.floor(value / 5);
-        statsBlock += `${stat.padEnd(statLabelWidth)} ${value.toString().padEnd(3)} [${half} / ${fifth}]\n`;
+        const base = `${stat.padEnd(statLabelWidth)} ${value.toString().padEnd(3)}`;
+        const extra = stat !== "Movement" ? ` [${Math.floor(value / 2)} / ${Math.floor(value / 5)}]` : "";
+        statsBlock += `${base}${extra}\n`;
     });
+
     const labelWidth = 11; // longest label: "Occupation"
     const infoBlock =
         `${"Name:".padEnd(labelWidth)} ${characterName}\n` +
