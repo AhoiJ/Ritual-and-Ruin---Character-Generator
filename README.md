@@ -4,7 +4,7 @@
 On Windows, open PowerShell or Command Prompt and run:
 ipconfig
 Look for something like:
-IPv4 Address. . . . . . . . . . . : 192.168.1.42 (not the real one)
+IPv4 Address. . . . . . . . . . . : xxx.xxx.x.xx (not the real one)
 
 2. Serve Your Site with a Local Server
 Depending on your setup, here are a few options:
